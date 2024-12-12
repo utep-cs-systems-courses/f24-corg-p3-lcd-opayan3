@@ -5,7 +5,7 @@
 
 #define S1 BIT3  // Button SW1 on P1.3
 #define S4 BIT4  // Button SW4 on P1.4
-#define LED1 BIT0  // LED 1 on P1.0
+#define LED1 BIT7  // LED 1 on P1.7
 
 typedef enum { SLEEP, WAKEUP } ProgramState;
 volatile ProgramState currentState = SLEEP;
