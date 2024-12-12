@@ -12,6 +12,7 @@
 typedef enum { SLEEP, WAKEUP } ProgramState;
 volatile ProgramState currentState = SLEEP;
 volatile unsigned int timerCount = 0;
+volatile int buttonPressed = 0;
 
 void configureButtons();
 void configureInterrupts();
