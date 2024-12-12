@@ -29,7 +29,7 @@ u_char _orientation = 0;
 
 /** CS convenience defines */
 #define LCD_SELECT() LCD_CS_OUT &= ~LCD_CS_PIN
-#define LCD_DESELECT()
+#define LCD_DESELECT() LCD_CS_OUT |= LCD_CS_PIN
 
 /** Data/command */
 #define LCD_DC_PIN	BIT4
