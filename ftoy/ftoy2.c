@@ -39,15 +39,19 @@ void main(void) {
   P1DIR |= LED1;  // Set LED1 as output
   P1OUT &= ~LED1; // Make sure LED is off initially
 
+   drawString5x7(10, 50, "Button Pressed 0", COLOR_WHITE, COLOR_BLACK);
+
   // Set up buttons, interrupts, and timer
   configureButtons();
   configureInterrupts();
   configureTimer();
 
+  drawString5x7(10, 50, "Button Pressed 1", COLOR_WHITE, COLOR_BLACK);
+  
   while (1) {
     if (buttonPressedFlag) {
       // Draw a message on LCD indicating button press
-      drawString5x7(10, 30, "Button Pressed", COLOR_WHITE, COLOR_BLACK);
+      drawString5x7(10, 30, "Button Pressed2", COLOR_WHITE, COLOR_BLACK);
       buttonPressedFlag = 0;  // Reset the flag
     }
     fillRectangle(0, 10, 100, 20, COLOR_BLACK);
@@ -78,7 +82,7 @@ void configureInterrupts() {
   P1IE |= (SW1 + SW4);        // Enable interrupts for SW1 and SW4
   P1IES |= (SW1 + SW4);       // Interrupt on falling edge (button press)
   P1IFG &= ~(SW1 + SW4);      // Clear interrupt flags for SW1 and SW4
-  __bis_SR_register(GIE);   // Enable global interrupts
+  // __bis_SR_register(GIE);   // Enable global interrupts
 }
 void configureTimer() {
   // Set Timer A to use ACLK, 1s interrupts
@@ -88,6 +92,7 @@ void configureTimer() {
 }
 #pragma vector=PORT1_VECTOR
 __interrupt void Port_1_ISR(void) {
+  drawString5x7(10, 40, "Interrupt Triggered", COLOR_WHITE, COLOR_BLACK);
   if (P1IFG & SW1) {
     SW1_ISR();  // Call the S1 interrupt service routine
   }
@@ -96,6 +101,7 @@ __interrupt void Port_1_ISR(void) {
   }
 }
 void SW1_ISR() {
+  drawString5x7(10, 50, "ISR Triggered", COLOR_WHITE, COLOR_BLACK);
   if (currentState == SLEEP) {
     currentState = WAKEUP;  // Change state to WAKEUP
     drawString5x7(10, 20, "State: WAKEUP", COLOR_WHITE, COLOR_BLACK);
@@ -116,4 +122,5 @@ void SW4_ISR() {
 #pragma vector=TIMER0_A0_VECTOR
 __interrupt void Timer_A(void) {
   timerCount++;  // Increment timer count every second
+  P1OUT ^= LED1;
 }
