@@ -21,7 +21,7 @@ void SW1_ISR();
 void SW4_ISR();
 void toggleLEDS();  // Called in assembly
 
-extern void toggleLEDsAsm(void);
+extern void toggleLEDS(void);
 
 void main(void)
 {
