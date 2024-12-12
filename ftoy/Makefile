@@ -22,7 +22,6 @@ ASM_OBJECTS = $(ASM_SOURCES:.s=.o)
 
 # Output files
 OUTPUT = toyf.elf
-HEX = toyf.hex
 
 # Default target: build everything
 all: $(OUTPUT)

@@ -19,7 +19,7 @@ void configureInterrupts();
 void configureTimer();
 void SW1_ISR();
 void SW4_ISR();
-void toggleLEDs();  // Called in assembly
+void toggleLEDS();  // Called in assembly
 
 extern void toggleLEDsAsm(void);
 
@@ -92,10 +92,10 @@ void SW1_ISR()
 {
   if (currentState == SLEEP) {
     currentState = WAKEUP;  // Change state to WAKEUP
-    toggleLEDs();            // Call assembly function to toggle LEDs
+    toggleLEDS();            // Call assembly function to toggle LEDs
   } else {
     currentState = SLEEP;   // Change state to SLEEP
-    toggleLEDs();            // Call assembly function to toggle LEDs
+    toggleLEDS();            // Call assembly function to toggle LEDs
   }
   buttonPressed = 1;  // Indicate button press
   P1IFG &= ~SW1;      // Clear interrupt flag for SW1
