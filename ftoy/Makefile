@@ -13,7 +13,7 @@ CC = msp430-elf-gcc
 AS = msp430-elf-as
 
 # Source files
-C_SOURCES = ftoy.c
+C_SOURCES = ftoy2.c
 ASM_SOURCES = toggleLEDS.s
 
 # Object files
