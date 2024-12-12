@@ -30,12 +30,13 @@ void display_arrow(char *arrow){
   delay(500);
 }
 
-unsigned char read_button(unssigned char button_pin){
+unsigned char read_button(unsigned char button_pin){
   return (P1IN & button_pin) ? 0 : 1;
 }
 
 void generate_new_sequence(){
   game_sequence[sequence_length - 1] = rand() % 2;
+  sequence_length++;
   display_sequence();
 }
 
@@ -89,12 +90,12 @@ void setup_interrupt(){
 __interrupt void Port_1(void){
   unsigned char button_pressed = 0;
 
-  if(P1FG & SW1_PIN){
+  if(P1IFG & SW1_PIN){
     button_pressed = 0;
     P1FG &= ~SW1_PIN;
     __delay_cycles(1000);
   }
-  if(P1FG & SW4_PIN){
+  if(P1IFG & SW4_PIN){
     button_pressed = 1;
     P1FG &= ~SW4_PIN;
     __delay_cycles(1000);
@@ -102,7 +103,7 @@ __interrupt void Port_1(void){
   if(current_state == WAIT_FOR_INPUT){
     check_input(button_pressed);
   }
-  if(current_state = WAIT_FOR_RESTART){
+  if(current_state == WAIT_FOR_RESTART){
     if(button_pressed == 0 || button_pressed == 1){
       reset_game();
     }
@@ -111,7 +112,7 @@ __interrupt void Port_1(void){
 int main(void){
   WDTCL = WDPTW | WDTHOLD;
   lcd_init();
-  setup_interrupts();
+  setup_interrupt();
   reset_game();
 
   while(1){
@@ -128,7 +129,7 @@ int main(void){
       break;
     case WAIT_FOR_RESTART:
       __bis_SR_register(LPM4_bits + GIE);
-      break
+      break;
     }
   }
   return 0;
