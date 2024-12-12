@@ -3,8 +3,8 @@
 #include "lcdutils.h"
 #include "lcddraw.h"
 
-#define S1 1  // Button SW1 on P1.3
-#define S4 8  // Button SW4 on P1.4
+#define SW1 1  // Button SW1 on P1.3
+#define SW4 8  // Button SW4 on P1.4
 #define LED1 BIT6  // LED 1 on P1.6
 
 typedef enum { SLEEP, WAKEUP } ProgramState;
@@ -28,12 +28,15 @@ void drawSword(int col, int row, unsigned short color) {
   fillRectangle(col, row, 2, 5, color);        // Sword handle
   fillRectangle(col + 1, row - 5, 1, 6, color);  // Sword blade
 }
+volatile int buttonPressedFlag = 0;
 
 void main(void) {
   WDTCTL = WDTPW | WDTHOLD;  // Stop the Watchdog timer
   configureClocks();
   lcd_init();  // Initialize the LCD
   drawString5x7(10, 10, "LCD Init", COLOR_WHITE, COLOR_BLACK);
+  fillRectangle(0, 0, 10, 10, COLOR_RED);
+  
   P1DIR |= LED1;  // Set LED1 as output
   P1OUT &= ~LED1; // Make sure LED is off initially
 
@@ -43,6 +46,11 @@ void main(void) {
   configureTimer();
 
   while (1) {
+    if (buttonPressedFlag) {
+      // Draw a message on LCD indicating button press
+      drawString5x7(10, 30, "Button Pressed", COLOR_WHITE, COLOR_BLACK);
+      buttonPressedFlag = 0;  // Reset the flag
+    }
     if (currentState == SLEEP) {
       // Sleep mode - LED 1 OFF
       P1OUT &= ~LED1;
@@ -60,14 +68,14 @@ void main(void) {
   }
 }
 void configureButtons() {
-  P1DIR &= ~(S1 + S4);     // Set SW1 and SW4 as input
-  P1REN |= (S1 + S4);       // Enable pull-up/down resistors
-  P1OUT |= (S1 + S4);       // Set pull-up resistors
+  P1DIR &= ~(SW1 + SW4);     // Set SW1 and SW4 as input
+  P1REN |= (SW1 + SW4);       // Enable pull-up/down resistors
+  P1OUT |= (SW1 + SW4);       // Set pull-up resistors
 }
 void configureInterrupts() {
-  P1IE |= (S1 + S4);        // Enable interrupts for SW1 and SW4
-  P1IES |= (S1 + S4);       // Interrupt on falling edge (button press)
-  P1IFG &= ~(S1 + S4);      // Clear interrupt flags for SW1 and SW4
+  P1IE |= (SW1 + SW4);        // Enable interrupts for SW1 and SW4
+  P1IES |= (SW1 + SW4);       // Interrupt on falling edge (button press)
+  P1IFG &= ~(SW1 + SW4);      // Clear interrupt flags for SW1 and SW4
   __bis_SR_register(GIE);   // Enable global interrupts
 }
 void configureTimer() {
@@ -78,27 +86,30 @@ void configureTimer() {
 }
 #pragma vector=PORT1_VECTOR
 __interrupt void Port_1_ISR(void) {
-  if (P1IFG & S1) {
+  if (P1IFG & SW1) {
+    drawString5x7(10, 40, "S1 IFG Set", COLOR_WHITE, COLOR_BLACK);
     SW1_ISR();  // Call the S1 interrupt service routine
   }
-  if (P1IFG & S4) {
+  if (P1IFG & SW4) {
     SW4_ISR();  // Call the S4 interrupt service routine
   }
 }
 void SW1_ISR() {
   if (currentState == SLEEP) {
     currentState = WAKEUP;  // Change state to WAKEUP
+    drawString5x7(10, 20, "State: WAKEUP", COLOR_WHITE, COLOR_BLACK);
     toggleLEDS();            // Call assembly function to toggle LEDs
   } else {
     currentState = SLEEP;   // Change state to SLEEP
+    drawString5x7(10, 20, "State: SLEEP", COLOR_WHITE, COLOR_BLACK); 
     toggleLEDS();            // Call assembly function to toggle LEDs
   }
   buttonPressed = 1;  // Indicate button press
-  P1IFG &= ~S1;      // Clear interrupt flag for S1
+  P1IFG &= ~SW1;      // Clear interrupt flag for S1
 }
 void SW4_ISR() {
   currentColorIndex = (currentColorIndex + 1 ) % 4;
-  P1IFG &= ~S4;      // Clear interrupt flag for S4
+  P1IFG &= ~SW4;      // Clear interrupt flag for S4
 }
 
 #pragma vector=TIMER0_A0_VECTOR
