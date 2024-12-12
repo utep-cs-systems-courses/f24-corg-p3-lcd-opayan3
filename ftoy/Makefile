@@ -1,12 +1,12 @@
-# MSP430 Makefile for ftoy.c and toggleLEDs.s
+# Makefile configuration for ftoy.c and toggleLEDs.s
 
 # Set the target MCU
 CPU = msp430g2553
 
 # Compiler and linker flags
-CFLAGS = -mmcu=${CPU} -Os -I../h   # Include headers from ../h
-LDFLAGS = -L../lib                  # Linker library path
-LIBS = -lTimer -lLcd                # Libraries to link against
+CFLAGS = -mmcu=${CPU} -Os -I../h  # Include headers from ../h
+LDFLAGS = -L../lib -L/opt/ti/msp430_gcc/include/  # Linker library path
+LIBS = -lTimer -lLcd  # Libraries to link against
 
 # Toolchain
 CC = msp430-elf-gcc
@@ -31,25 +31,15 @@ all: $(OUTPUT)
 $(OUTPUT): $(C_OBJECTS) $(ASM_OBJECTS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $^ $(LIBS)
 
-# Convert ELF to HEX format (for flashing)
-$(HEX): $(OUTPUT)
-	msp430-objcopy -O ihex $(OUTPUT) $(HEX)
-
-# Flash the MSP430
-flash: $(HEX)
-	msp430loader.sh $(HEX)
-
 # Compile C source files
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
 # Compile Assembly source files
 %.o: %.s
-	$(AS) -mmcu=${CPU} -c -$< -o $@
+	$(AS) -mmcu=${CPU} -c $< -o $@
+
 # Clean up build files
 clean:
 	rm -f *.o $(OUTPUT) $(HEX)
 
-# Debugging or disassembling (optional)
-disassemble: $(OUTPUT)
-	$(OBJDUMP) -D $(OUTPUT) > disassembly.txt
