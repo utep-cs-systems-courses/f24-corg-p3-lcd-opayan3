@@ -28,7 +28,10 @@ void main(void)
   WDTCTL = WDTPW | WDTHOLD;  // Stop the Watchdog timer
   configureClocks();
   lcd_init();  // Initialize the LCD
-
+  drawString5x7(10, 10, "LCD Init", COLOR_WHITE, COLOR_BLACK);
+  P1DIR |= (LED1 + LED2);   // Set LED pins as output
+  P1OUT &= ~(LED1 + LED2);  // Make sure LEDs are initially off
+  
   // Set up buttons, interrupts, and timer
   configureButtons();
   configureInterrupts();
@@ -36,6 +39,7 @@ void main(void)
 
   while(1)
     {
+            
       if (currentState == SLEEP) {
 	// Sleep mode - LED 1 OFF, LED 2 OFF
 	P1OUT &= ~(LED1 + LED2);
