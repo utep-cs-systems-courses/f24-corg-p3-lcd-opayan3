@@ -1,5 +1,6 @@
 #include "msp430.h"
 #include <stdio.h>
+#include "lcdutils.h"
 #inlcude "timerLib.h"
 
 void setup();
@@ -69,6 +70,8 @@ void setup(){
   TA0CTL = TASSEL_1 | MC_0 | TACLR;
   TA0CCTL0 = CCIE;
   TA0CCR0 = 250;
+
+  lcd_init();
 }
 
 void sleep_mode(){
@@ -92,6 +95,28 @@ void stop_timer(){
 }
 
 void display_text(const char *text, int x, int y){
+  u_char i, j;
+  u_char character;
+
+  // Set the area on the LCD screen to draw the text
+  lcd_setArea(x, y, x + 5 * strlen(text) - 1, y + 7); // Adjusting for font size
+
+  // Loop through each character in the text string
+  while (*text) {
+    character = *text - 32;  // ASCII 32 (space) is the first printable character
+    for (i = 0; i < 5; i++) {  // 5 columns per character in 5x7 font
+      u_char row = font_5x7[character][i]; // Get character data from font
+      for (j = 0; j < 7; j++) {  // 7 rows per character in 5x7 font
+	if (row & (1 << j)) {
+	  lcd_writeColor(COLOR_WHITE);  // If bit is set, write color (text color)
+	} else {
+	  lcd_writeColor(COLOR_BLACK);  // If bit is clear, write background color
+	}
+      }
+    }
+    text++;  // Move to the next character
+    x += 5;  // Move to the next character's position
+  }
 }
 
 void show_result(int reaction_time){
