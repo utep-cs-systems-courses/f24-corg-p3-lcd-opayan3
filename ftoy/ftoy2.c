@@ -3,9 +3,9 @@
 #include "lcdutils.h"
 #include "lcddraw.h"
 
-#define S1 BIT3  // Button SW1 on P1.3
-#define S4 BIT4  // Button SW4 on P1.4
-#define LED1 BIT7  // LED 1 on P1.7
+#define S1 1  // Button SW1 on P1.3
+#define S4 8  // Button SW4 on P1.4
+#define LED1 BIT6  // LED 1 on P1.6
 
 typedef enum { SLEEP, WAKEUP } ProgramState;
 volatile ProgramState currentState = SLEEP;
