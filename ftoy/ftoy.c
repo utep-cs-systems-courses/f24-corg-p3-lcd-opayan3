@@ -84,11 +84,11 @@ void configureTimer()
 __interrupt void Port_1_ISR(void)
 {
   if (P1IFG & S1) {
-    S1_ISR();  // Call the SW1 interrupt service routine
+    S1_ISR();  // Call the S1 interrupt service routine
   }
 
   if (P1IFG & S4) {
-    S4_ISR();  // Call the SW4 interrupt service routine
+    S4_ISR();  // Call the S4 interrupt service routine
   }
 }
 void S1_ISR()
@@ -101,13 +101,13 @@ void S1_ISR()
     toggleLEDS();            // Call assembly function to toggle LEDs
   }
   buttonPressed = 1;  // Indicate button press
-  P1IFG &= ~S1;      // Clear interrupt flag for SW1
+  P1IFG &= ~S1;      // Clear interrupt flag for S1
 }
 void S4_ISR()
 {
   // Handle SW4 button press
   // (could trigger another state change or action)
-  P1IFG &= ~S4;      // Clear interrupt flag for SW4
+  P1IFG &= ~S4;      // Clear interrupt flag for S4
 }
 
 #pragma vector=TIMER0_A0_VECTOR
