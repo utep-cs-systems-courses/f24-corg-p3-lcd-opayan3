@@ -1,7 +1,7 @@
 #include "msp430.h"
 #include <stdio.h>
 #include "lcdutils.h"
-#inlcude "timerLib.h"
+#include "timerLib.h"
 
 void setup();
 void sleep_mode();
