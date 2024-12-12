@@ -14,15 +14,15 @@ AS = msp430-elf-as
 
 # Source files
 C_SOURCES = ftoy.c
-ASM_SOURCES = toggleLEDs.s
+ASM_SOURCES = toggleLEDS.s
 
 # Object files
 C_OBJECTS = $(C_SOURCES:.c=.o)
 ASM_OBJECTS = $(ASM_SOURCES:.s=.o)
 
 # Output files
-OUTPUT = msquares.elf
-HEX = msquares.hex
+OUTPUT = toyf.elf
+HEX = toyf.hex
 
 # Default target: build everything
 all: $(OUTPUT)
