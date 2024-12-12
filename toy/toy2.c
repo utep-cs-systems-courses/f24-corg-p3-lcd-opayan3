@@ -1,11 +1,12 @@
 #include "msp430.h"
+#include <stdio.h>
 
 void setup();
 void sleep_mode();
 void wake_up();
 void start_timer();
 void stop_timer();
-void display_text(cosnt char *text, int x, int y);
+void display_text(const char *text, int x, int y);
 void reaction_time_calc_asm();
 void show_result(int reaction_time);
 
@@ -70,7 +71,7 @@ void setup(){
 
 void sleep_mode(){
   P1OUT &= ~BIT0;
-  __bis_SR-register(LPM3_bits + GIE);
+  __bis_SR_register(LPM3_bits + GIE);
 }
 
 void wake_up(){
@@ -88,7 +89,7 @@ void stop_timer(){
   reaction_time = timer_count;
 }
 
-void display_text(cons char *text, int x, int y){
+void display_text(const char *text, int x, int y){
 }
 
 void show_result(int reaction_time){
@@ -107,7 +108,7 @@ __interrupt void PORT_1_ISR(){
   P1IFG &= ~BIT1;
 }
 
-#pragma vector = PORT@_VECTOR
+#pragma vector = PORT2_VECTOR
 __interupt void PORT_2_ISR(){
   if(P2IFG & BIT4){
     if(game_state == 3){
@@ -116,4 +117,9 @@ __interupt void PORT_2_ISR(){
     }
   }
   P2IFG &= ~BIT4;
+}
+
+#pragma vector = TIMER0_A0_VECTOR
+__interrupt void Timer_A_ISR(){
+  timer_count++;
 }
