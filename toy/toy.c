@@ -12,6 +12,10 @@
 
 #define MAX_SEQUENCE_LENGTH 10
 
+#define ORIENTATION_HORIZONTAL 0
+#define ORIENTATION_VERTICAL_ROTATED 1
+#define ORIENTATION_HORIZONTAL_ROTATED 2
+
 unsigned char game_sequence[MAX_SEQUENCE_LENGTH];
 unsigned char current_index = 0;
 unsigned char sequence_length = 1;
