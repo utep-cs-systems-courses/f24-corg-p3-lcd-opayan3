@@ -1,41 +1,35 @@
-CPU             = msp430g2553
-CFLAGS          = -mmcu=$(CPU) -Os -I../lcdLib -I../timerLib -I
-CC              = msp430-elf-gcc
-AS              = msp430-elf-as
-AR              = msp430-elf-ar
+TARGET = toy2.out
 
-# Define your output file (executable)
-OUTPUT          = main.out
+# MSP430 toolchain settings
+CC = msp430-elf-gcc
+AS = msp430-elf-as
+LD = msp430-elf-ld
+CFLAGS = -mmcu=msp430g2553 -Wall -Os
+LDFLAGS = -L../timerLib -L../lcdLib  # Linker flags to use libraries from these folders
 
-# Define the source files (C and Assembly)
-SRC_C           = toy2.c
-SRC_ASM         = reaction_time.s
+# Paths to header files
+INCLUDE_DIRS = -I../timerLib -I../lcdLib
+
+# Source files
+SRCS = toy2.c reaction_time.s
 
 # Object files
-OBJ_C           = $(SRC_C:.c=.o)
-OBJ_ASM         = $(SRC_ASM:.s=.o)
+OBJS = $(SRCS:.c=.o) $(SRCS:.s=.o)
 
-# Default target
-all: $(OUTPUT)
+# Default rule: build the target
+all: $(TARGET)
 
-# Rule to build the final output (main.out)
-$(OUTPUT): $(OBJ_C) $(OBJ_ASM)
-	$(CC) $(CFLAGS) -o $(OUTPUT) $(OBJ_C) $(OBJ_ASM)
+$(TARGET): $(OBJS)
+	$(CC) $(OBJS) $(LDFLAGS) -o $(TARGET)
 
-# Rule to compile C files into object files
+# Rule for compiling .c files
 %.o: %.c
-	$(CC) $(CFLAGS) -c $< -o $@
+	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c $< -o $@
 
-# Rule to compile Assembly files into object files
+# Rule for assembling .s files
 %.o: %.s
-	$(AS) -mmcu=$(CPU) -o $@ $<
+	$(AS) -mmcu=msp430g2553 -o $@ $<
 
-# Rule to clean up object files and output
+# Clean up generated files
 clean:
-	rm -f $(OBJ_C) $(OBJ_ASM) $(OUTPUT)
-
-# Optional install rule (if needed)
-install: $(OUTPUT)
-	mkdir -p ../h ../lib
-	mv $(OUTPUT) ../lib
-	cp *.h ../h
+	rm -f $(OBJS) $(TARGET)
