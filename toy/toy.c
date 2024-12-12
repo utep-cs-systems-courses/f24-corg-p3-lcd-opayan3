@@ -92,12 +92,12 @@ __interrupt void Port_1(void){
 
   if(P1IFG & SW1_PIN){
     button_pressed = 0;
-    P1FG &= ~SW1_PIN;
+    P1IFG &= ~SW1_PIN;
     __delay_cycles(1000);
   }
   if(P1IFG & SW4_PIN){
     button_pressed = 1;
-    P1FG &= ~SW4_PIN;
+    P1IFG &= ~SW4_PIN;
     __delay_cycles(1000);
   }
   if(current_state == WAIT_FOR_INPUT){
@@ -118,7 +118,7 @@ int main(void){
   while(1){
     switch (current_state){
     case DISPLAY_SEQUENCE:
-      display_sequenc();
+      display_sequence();
       current_state = WAIT_FOR_INPUT;
       break;
     case WAIT_FOR_INPUT:
