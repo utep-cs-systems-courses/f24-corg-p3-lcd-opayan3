@@ -3,8 +3,8 @@
 #include "lcddraw.h"
 #include "libTimer.h"
 
-#define SW1 BIT3   // Button SW1 on P1.3
-#define SW4 BIT4   // Button SW4 on P1.4
+#define S1 BIT3   // Button SW1 on P1.3
+#define S4 BIT4   // Button SW4 on P1.4
 #define LED1 BIT0  // LED 1 on P1.0
 #define LED2 BIT6  // LED 2 on P1.6
 
@@ -62,15 +62,15 @@ void main(void)
 }
 void configureButtons()
 {
-  P1DIR &= ~(SW1 + SW4);     // Set SW1 and SW4 as input
-  P1REN |= (SW1 + SW4);       // Enable pull-up/down resistors
-  P1OUT |= (SW1 + SW4);       // Set pull-up resistors (SW1 and SW4 should be pulled high)
+  P1DIR &= ~(S1 + S4);     // Set SW1 and SW4 as input
+  P1REN |= (S1 + S4);       // Enable pull-up/down resistors
+  P1OUT |= (S1 + S4);       // Set pull-up resistors (SW1 and SW4 should be pulled high)
 }
 void configureInterrupts()
 {
-  P1IE |= (SW1 + SW4);        // Enable interrupts for SW1 and SW4
-  P1IES |= (SW1 + SW4);       // Interrupt on falling edge (button press)
-  P1IFG &= ~(SW1 + SW4);      // Clear interrupt flags for SW1 and SW4
+  P1IE |= (S1 + S4);        // Enable interrupts for SW1 and SW4
+  P1IES |= (S1 + S4);       // Interrupt on falling edge (button press)
+  P1IFG &= ~(S1 + S4);      // Clear interrupt flags for SW1 and SW4
   __bis_SR_register(GIE);     // Enable global interrupts
 }
 void configureTimer()
@@ -83,15 +83,15 @@ void configureTimer()
 #pragma vector=PORT1_VECTOR
 __interrupt void Port_1_ISR(void)
 {
-  if (P1IFG & SW1) {
-    SW1_ISR();  // Call the SW1 interrupt service routine
+  if (P1IFG & S1) {
+    S1_ISR();  // Call the SW1 interrupt service routine
   }
 
-  if (P1IFG & SW4) {
-    SW4_ISR();  // Call the SW4 interrupt service routine
+  if (P1IFG & S4) {
+    S4_ISR();  // Call the SW4 interrupt service routine
   }
 }
-void SW1_ISR()
+void S1_ISR()
 {
   if (currentState == SLEEP) {
     currentState = WAKEUP;  // Change state to WAKEUP
@@ -101,13 +101,13 @@ void SW1_ISR()
     toggleLEDS();            // Call assembly function to toggle LEDs
   }
   buttonPressed = 1;  // Indicate button press
-  P1IFG &= ~SW1;      // Clear interrupt flag for SW1
+  P1IFG &= ~S1;      // Clear interrupt flag for SW1
 }
-void SW4_ISR()
+void S4_ISR()
 {
   // Handle SW4 button press
   // (could trigger another state change or action)
-  P1IFG &= ~SW4;      // Clear interrupt flag for SW4
+  P1IFG &= ~S4;      // Clear interrupt flag for SW4
 }
 
 #pragma vector=TIMER0_A0_VECTOR
