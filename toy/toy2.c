@@ -109,7 +109,7 @@ __interrupt void PORT_1_ISR(){
 }
 
 #pragma vector = PORT2_VECTOR
-__interupt void PORT_2_ISR(){
+__interrupt void PORT_2_ISR(){
   if(P2IFG & BIT4){
     if(game_state == 3){
       stop_timer();
