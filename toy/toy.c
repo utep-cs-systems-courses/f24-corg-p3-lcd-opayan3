@@ -1,9 +1,11 @@
 #include "msp430.h"
 #include <stdlib.h>
 #include "lcdutils.h"
+#include "main.s"
 
 #define SW1_PIN BIT0
 #define SW4_PIN BIT3
+#define LED_PIN BIT6 // LED on P1.6
 
 #define LEFT_ARROW "<----"
 #define RIGHT_ARROW "---->"
@@ -19,8 +21,8 @@ typedef enum{
   WAIT_FOR_INPUT,
   CHECK_INPUT,
   GAME_OVER,
-  WAIT_FOR_RESTART
-}GameState;
+    WAIT_FOR_RESTART
+} GameState;
 
 GameState current_state = DISPLAY_SEQUENCE;
 
@@ -44,7 +46,7 @@ void display_sequence(){
   for(unsigned char i = 0; i < sequence_length; i++){
     if(game_sequence[i] == 0){
       display_arrow(LEFT_ARROW);
-    }else{
+    } else {
       display_arrow(RIGHT_ARROW);
     }
   }
@@ -59,7 +61,7 @@ void check_input(unsigned char player_choice){
       current_state = DISPLAY_SEQUENCE;
       generate_new_sequence();
     }
-  }else{
+  } else {
     current_state = GAME_OVER;
   }
 }
@@ -78,19 +80,22 @@ void reset_game(){
   generate_new_sequence();
 }
 
-void setup_interrupt(){
-  P1DIR &= ~(SW1_PIN | SW4_PIN);
-  P1REN |= (SW1_PIN | SW4_PIN);
-  P1OUT |= (SW1_PIN | SW4_PIN);
-  P1IE |= (SW1_PIN | SW4_PIN);
-  P1IES |= (SW1_PIN | SW4_PIN);
-  P1IFG &= ~(SW1_PIN | SW4_PIN);
+id setup_interrupt(){
+  P1DIR &= ~(SW1_PIN | SW4_PIN);  // Set SW1 and SW4 as input
+  P1REN |= (SW1_PIN | SW4_PIN);   // Enable pull-up resistors
+  P1OUT |= (SW1_PIN | SW4_PIN);   // Pull-up on buttons
+  P1IE |= (SW1_PIN | SW4_PIN);    // Enable interrupts for buttons
+  P1IES |= (SW1_PIN | SW4_PIN);   // Interrupt on high-to-low transition
+  P1IFG &= ~(SW1_PIN | SW4_PIN);  // Clear interrupt flags
+}
+
+void setup_timer(){
+  TA0CCTL0 = CCIE;      // Enable interrupt for timer
+  TA0CCR0 = 1000;       // Set timer period
+  TA0CTL = TASSEL_2 + MC_1; // Use SMCLK, up mode
 }
 
 __interrupt void Port_1(void){
-  static unsigned int debounce_delay = 5000;
-  static unsigned int last_interrupt_time = 0;
-  
   unsigned char button_pressed = 0;
 
   if(P1IFG & SW1_PIN){
@@ -101,11 +106,7 @@ __interrupt void Port_1(void){
     button_pressed = 1;
     P1IFG &= ~SW4_PIN;
   }
-  unsigned int current_time = __get_SR_register();
-  if(current_time - last_interrupt_time > debounce_delay){
-    last_interrupt_time = current_time;
-  }
-  
+
   if(current_state == WAIT_FOR_INPUT){
     check_input(button_pressed);
   }
@@ -115,11 +116,19 @@ __interrupt void Port_1(void){
     }
   }
 }
+
+__interrupt void Timer_A (void){
+  P1OUT ^= LED_PIN;
+}
+
+extern void _asmFunction(void); 
+
 int main(void){
-  WDTCL = WDPTW | WDTHOLD;
-  lcd_init();
-  setup_interrupt();
-  reset_game();
+  WDTCL = WDPTW | WDTHOLD;  // Stop watchdog timer
+  lcd_init();                // Initialize the LCD
+  setup_interrupt();         // Setup button interrupts
+  setup_timer();             // Setup timer interrupt
+  reset_game();              // Start the game
 
   while(1){
     switch (current_state){
@@ -128,13 +137,13 @@ int main(void){
       current_state = WAIT_FOR_INPUT;
       break;
     case WAIT_FOR_INPUT:
-      __low_power_mode_3();
+      __low_power_mode_3();  // Low-power mode while waiting for input
       break;
     case GAME_OVER:
       display_game_over();
       break;
     case WAIT_FOR_RESTART:
-      __bis_SR_register(LPM4_bits + GIE);
+      __bis_SR_register(LPM4_bits + GIE);  // Wait for restart in low-power mode
       break;
     }
   }
@@ -143,5 +152,5 @@ int main(void){
 
 void delay(unsigned int count){
   volatile unsigned int i;
-  for(i = 0; i< count; i++);
+  for(i = 0; i < count; i++);
 }

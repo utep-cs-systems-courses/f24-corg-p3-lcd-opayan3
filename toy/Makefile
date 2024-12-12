@@ -1,13 +1,9 @@
 CC = msp430-gcc
-CFLAGS = -Wall -mmcu=msp430g2553
+CFLAGS = -Wall -mmcu=msp430g2553 -I./lcdlib
 
-# List of source files
-SRC = toy.c lcdlib/lcdutils.c
-
-# The output file
+SRC = toy.c lcdlib/lcdutils.c main.s
 OUTPUT = game.elf
 
-# How to build the output file from source files
 $(OUTPUT): $(SRC)
 	$(CC) $(CFLAGS) $(SRC) -o $(OUTPUT)
 
