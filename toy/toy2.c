@@ -1,5 +1,6 @@
 #include "msp430.h"
 #include <stdio.h>
+#inlcude "timerLib.h"
 
 void setup();
 void sleep_mode();
@@ -16,6 +17,7 @@ volatile int timer_count = 0;
 
 int main(void){
   WDTCTL = WDTPW | WDTHOLD;
+  configureClocks();
   setup();
 
   while(1){
