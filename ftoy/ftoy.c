@@ -34,7 +34,6 @@ void main(void)
   configureInterrupts();
   configureTimer();
 
-  // Main loop
   while(1)
     {
       if (currentState == SLEEP) {
@@ -51,7 +50,7 @@ void main(void)
 
       // Timer-based updates
       if (timerCount >= 1000) {
-	// Every 1 second, update graphics (as an example)
+	// Every 1 second, update graphics
 	drawString5x7(10, 20, "1 sec passed", COLOR_WHITE, COLOR_BLACK);
 	timerCount = 0;  // Reset timer count
       }
