@@ -10,7 +10,7 @@
 typedef enum { SLEEP, WAKEUP } ProgramState;
 volatile ProgramState currentState = SLEEP;
 volatile unsigned int timerCount = 0;
-volatile int buttonPressed = 0;
+volatile int buttonPressedFlag = 0;
 
 unsigned short swordColors[] = {COLOR_RED, COLOR_GREEN, COLOR_BLUE, COLOR_YELLOW};
 unsigned char currentColorIndex = 0; 
@@ -28,7 +28,6 @@ void drawSword(int col, int row, unsigned short color) {
   fillRectangle(col, row, 2, 5, color);        // Sword handle
   fillRectangle(col + 1, row - 5, 1, 6, color);  // Sword blade
 }
-volatile int buttonPressedFlag = 0;
 
 void main(void) {
   WDTCTL = WDTPW | WDTHOLD;  // Stop the Watchdog timer
@@ -51,6 +50,8 @@ void main(void) {
       drawString5x7(10, 30, "Button Pressed", COLOR_WHITE, COLOR_BLACK);
       buttonPressedFlag = 0;  // Reset the flag
     }
+    fillRectangle(0, 10, 100, 20, COLOR_BLACK);
+    
     if (currentState == SLEEP) {
       // Sleep mode - LED 1 OFF
       P1OUT &= ~LED1;
@@ -62,6 +63,7 @@ void main(void) {
       drawSword(50, 40,swordColors[currentColorIndex]);  // Draw sword when awake
     }
     if (timerCount >= 1000) {  // Every 1 second
+      fillRectangle(0, 20, 100, 20, COLOR_BLACK);
       drawString5x7(10, 20, "1 sec passed", COLOR_WHITE, COLOR_BLACK);
       timerCount = 0;  // Reset timer count
     }
@@ -87,7 +89,6 @@ void configureTimer() {
 #pragma vector=PORT1_VECTOR
 __interrupt void Port_1_ISR(void) {
   if (P1IFG & SW1) {
-    drawString5x7(10, 40, "S1 IFG Set", COLOR_WHITE, COLOR_BLACK);
     SW1_ISR();  // Call the S1 interrupt service routine
   }
   if (P1IFG & SW4) {
@@ -104,7 +105,7 @@ void SW1_ISR() {
     drawString5x7(10, 20, "State: SLEEP", COLOR_WHITE, COLOR_BLACK); 
     toggleLEDS();            // Call assembly function to toggle LEDs
   }
-  buttonPressed = 1;  // Indicate button press
+  buttonPressedFlag = 1;  // Indicate button press
   P1IFG &= ~SW1;      // Clear interrupt flag for S1
 }
 void SW4_ISR() {
