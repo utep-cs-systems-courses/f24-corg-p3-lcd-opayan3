@@ -88,18 +88,24 @@ void setup_interrupt(){
 }
 
 __interrupt void Port_1(void){
+  static unsigned int debounce_delay = 5000;
+  static unsigned int last_interrupt_time = 0;
+  
   unsigned char button_pressed = 0;
 
   if(P1IFG & SW1_PIN){
     button_pressed = 0;
     P1IFG &= ~SW1_PIN;
-    __delay_cycles(1000);
   }
   if(P1IFG & SW4_PIN){
     button_pressed = 1;
     P1IFG &= ~SW4_PIN;
-    __delay_cycles(1000);
   }
+  unsigned int current_time = __get_SR_register();
+  if(current_time - last_interrupt_time > debounce_delay){
+    last_interrupt_time = current_time;
+  }
+  
   if(current_state == WAIT_FOR_INPUT){
     check_input(button_pressed);
   }
