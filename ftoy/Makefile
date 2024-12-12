@@ -45,7 +45,7 @@ flash: $(HEX)
 
 # Compile Assembly source files
 %.o: %.s
-	$(AS) -mmcu=${CPU} -$< -o $@
+	$(AS) -mmcu=${CPU} -c -$< -o $@
 # Clean up build files
 clean:
 	rm -f *.o $(OUTPUT) $(HEX)
