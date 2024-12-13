@@ -1,9 +1,11 @@
+
 #include "msp430.h"
 #include <stdlib.h>
 #include "lcdutils.h"
-#include "main.s"
+#include "libTimer.h"
+#include "asmFucntion.s"
 
-#define SW1_PIN BIT0
+#define SW1_PIN BIT2
 #define SW4_PIN BIT3
 #define LED_PIN BIT6 // LED on P1.6
 
@@ -84,7 +86,7 @@ void reset_game(){
   generate_new_sequence();
 }
 
-id setup_interrupt(){
+void setup_interrupt(){
   P1DIR &= ~(SW1_PIN | SW4_PIN);  // Set SW1 and SW4 as input
   P1REN |= (SW1_PIN | SW4_PIN);   // Enable pull-up resistors
   P1OUT |= (SW1_PIN | SW4_PIN);   // Pull-up on buttons
@@ -125,14 +127,15 @@ __interrupt void Timer_A (void){
   P1OUT ^= LED_PIN;
 }
 
-extern void _asmFunction(void); 
+extern void asmFucntion(void); 
 
 int main(void){
-  WDTCL = WDPTW | WDTHOLD;  // Stop watchdog timer
+  WDTCTL = WDTPW | WDTHOLD;  // Stop watchdog timer
   lcd_init();                // Initialize the LCD
   setup_interrupt();         // Setup button interrupts
   setup_timer();             // Setup timer interrupt
   reset_game();              // Start the game
+  display_sequence();
 
   while(1){
     switch (current_state){
