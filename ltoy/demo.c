@@ -70,7 +70,8 @@ switch_interrupt_handler()
   // Sound for SW4 (Stop ball movement)
   else if (switches & SW4) {
     buzzer_set_period(2000);   // Play a 2kHz sound for SW4 action
-    controlPos[0] = controlPos[0];  // Stops the ball (no position change)
+    // controlPos[0] = controlPos[0];  // Stops the ball (no position change)
+    red = (red - 3) % 32;   // Change the red color component
   }
 }
 
