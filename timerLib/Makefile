@@ -8,7 +8,7 @@ CC              = msp430-elf-gcc
 AS              = msp430-elf-as
 AR              = msp430-elf-ar
 
-libTimer.a: clocksTimer.o sr.o
+libTimer.a: clocksTimer.o sr.o buzzer.o
 	$(AR) crs $@ $^
 
 install: libTimer.a
