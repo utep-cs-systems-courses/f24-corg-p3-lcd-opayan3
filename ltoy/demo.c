@@ -2,7 +2,7 @@
 #include <libTimer.h>
 #include "lcdutils.h"
 #include "lcddraw.h"
-//#include "buzzer.h"
+#include "buzzer.h"
 
 #define LED BIT6       /* note that bit zero req'd for display */
 
@@ -49,27 +49,27 @@ switch_interrupt_handler()
     isAwake = !isAwake;
     if (isAwake) {
       P1OUT |= LED;  // Turn on LED to indicate wake-up state
-      //buzzer_set_period(1000);  // Play a 2kHz sound for wake-up
+      buzzer_set_period(1000);  // Play a 2kHz sound for wake-up
     } else {
       P1OUT &= ~LED;  // Turn off LED to indicate sleep state
-      //buzzer_set_period(0);  // Turn off buzzer when going to sleep
+      buzzer_set_period(0);  // Turn off buzzer when going to sleep
     }
   }
   // Sound for SW2 (Increase blue color component)
   else if (switches & SW2) {
-    //buzzer_set_period(1500);  // Play a 1.5kHz sound for SW2 action
+    buzzer_set_period(1500);  // Play a 1.5kHz sound for SW2 action
     blue = (blue + 2) % 32;   // Change the blue color component
   }
 
   // Sound for SW3 (Increase green color component)
   else if (switches & SW3) {
-    //buzzer_set_period(1000);  // Play a 1kHz sound for SW3 action
+    buzzer_set_period(1000);  // Play a 1kHz sound for SW3 action
     green = (green + 1) % 64;  // Change the green color component
   }
 
   // Sound for SW4 (Stop ball movement)
   else if (switches & SW4) {
-    //buzzer_set_period(2000);   // Play a 2kHz sound for SW4 action
+    buzzer_set_period(2000);   // Play a 2kHz sound for SW4 action
     // controlPos[0] = controlPos[0];  // Stops the ball (no position change)
     red = (red - 3) % 32;   // Change the red color component
   }
@@ -141,7 +141,7 @@ void main() {
   configureClocks();  // Configure the clocks
   lcd_init();         // Initialize the LCD
   switch_init();      // Initialize switches
-  //buzzer_init();      // Initialize the buzzer
+  buzzer_init();      // Initialize the buzzer
 
   enableWDTInterrupts();      /**< enable periodic interrupt */
   or_sr(0x8);              /**< GIE (enable interrupts) */
